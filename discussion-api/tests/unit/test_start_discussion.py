@@ -3,6 +3,7 @@ from discussion.start_discussion import start_discussion
 from utils.delete_db_info import delete_db_info
 
 def test_start_empty_discussion():
+    delete_db_info()
     event = {
         "started_by": "",
         "question": ""
@@ -16,6 +17,7 @@ def test_start_empty_discussion():
     delete_db_info()
 
 def test_start_discussion():
+    delete_db_info()
     event1 = {
         "started_by": "Thomas",
         "question": "What is your favorite color"
