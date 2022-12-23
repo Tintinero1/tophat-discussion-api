@@ -3,7 +3,6 @@ import json
 from discussion.db_handler.mysql_dbconn import DbConnection
 from discussion.db_handler.db_vars import (
     ENDPOINT_URL,
-    PORT,
     USERNAME,
     PASSWORD,
     DB_NAME
