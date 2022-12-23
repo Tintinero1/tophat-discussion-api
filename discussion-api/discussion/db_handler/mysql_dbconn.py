@@ -34,14 +34,14 @@ class DbConnection(object):
             result += "'%s'%s" % (item, comma)
         return result
     
-    def execute_and_fetch(self, query, fetch='all'):
+    def execute_and_fetch(self, query, fetch='all', multi=False):
         """ Opens up a cursor and closes it automatically after executing a desired query\n
         Returns result \n
         fetch: str: 'all', 'one', 'many', 'none'"""
         try:
             self.cursor = self.mydb.cursor()
             self.cursor.execute("use %s" % (self.db_name))
-            self.cursor.execute(query)
+            self.cursor.execute(query, multi=multi)
             if fetch == 'one':
                 result = self.cursor.fetchone()
             elif fetch == 'all':
@@ -141,7 +141,6 @@ class DbConnection(object):
             self.mydb.commit()
 
             result = list(cursor.stored_results())
-            # print(out_parameters, len(out_parameters))
             
             if len(result) == 0:
                 index = 0

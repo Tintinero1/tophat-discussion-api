@@ -51,6 +51,17 @@ def test_start_discussion():
     assert out["body"]["message"] == "Invalid question. Questions must have text"
     assert "discussion_id" not in out["body"].keys()
 
+    event4 = {
+        "started_by": "Thomas",
+        "question": "What is your favorite color"
+    }
+
+    out = start_discussion(event4,"")
+    out["body"] = json.loads(out["body"])
+    assert out["statusCode"] == 400
+    assert out["body"]["message"] == "Discussion already exists"
+    assert "discussion_id" not in out["body"].keys()
+
     delete_db_info()
 
 if __name__ == "__main__":

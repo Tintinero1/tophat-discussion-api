@@ -71,6 +71,10 @@ def start_discussion(event, context):
             out["body"]["message"] = "Created new discussion"
             out["body"]["discussion_id"] = out_discussion_parameters[0]
             out["body"] = json.dumps(out["body"])
+        elif out_discussion_parameters and out_discussion_parameters[0] == 0:
+            out["statusCode"] = 400
+            out["body"]["message"] = "Discussion already exists"
+            out["body"] = json.dumps(out["body"])
 
     except Exception as e:
         # Send some context about this error to Lambda Logs

@@ -17,4 +17,8 @@ DISCUSSION_LIST = [
         "started_by": "Michael",
         "question": "How old are you"
     },
+    {
+        "started_by": "Raphael",
+        "question": "What do you want to learn today"
+    },
 ]
