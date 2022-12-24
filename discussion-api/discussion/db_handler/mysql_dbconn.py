@@ -7,13 +7,6 @@ class DbConnection(object):
     mydb = ""
     __instance = None
 
-    # def __new__(cls):
-    #     """ Singleton model for Database """
-    #     if DbConnection.__instance is None:
-    #         DbConnection.__instance = object.__new__(cls)
-        
-    #     return DbConnection.__instance
-
     def __init__(self, host="localhost", user="root", passwd="Monotiti1", db_name="ib_db"):
             self.db_name = db_name
             self.mydb = connect(host=host, user=user, passwd=passwd, auth_plugin='mysql_native_password')
