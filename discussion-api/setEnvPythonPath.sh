@@ -21,10 +21,13 @@ while true; do
         [Yy]* ) 
             echo "Setting PYTHONPATH for this app";
             # Exporting app directory
-            echo "export PYTHONPATH=$PWD" >> ~/.bashrc;
+            echo "export PYTHONPATH=\"\${PYTHONPATH}:$PWD\"" >> ~/.bashrc;
+            cd "discussion-api/discussion/"
+            # Exporting app directory
+            echo "export PYTHONPATH=\"\${PYTHONPATH}:$PWD\"" >> ~/.bashrc;
             cd ..
             # Exporting parent directory
-            echo "export PYTHONPATH=$PWD" >> ~/.bashrc;
+            echo "export PYTHONPATH=\"\${PYTHONPATH}:$PWD\"" >> ~/.bashrc;
 
             echo -e "${GREEN}Export finished, permanent variables implemented.${NC}";
             break;;
