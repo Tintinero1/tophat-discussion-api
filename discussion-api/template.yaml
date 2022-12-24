@@ -105,9 +105,6 @@ Outputs:
     Description: "Implicit IAM Role created for Start Discussion Function"
     Value: !GetAtt StartDiscussionFunctionRole.Arn
 
-  # RespondDiscussionApi:
-  #   Description: "API Gateway endpoint URL for Prod stage for Respond Discussion function"
-  #   Value: !Sub "https://${DiscussionAPI}.execute-api.${AWS::Region}.amazonaws.com/Prod/responddiscussion/"
   RespondDiscussionFunction:
     Description: "Respond Discussion Lambda Function ARN"
     Value: !GetAtt RespondDiscussionFunction.Arn
@@ -115,9 +112,6 @@ Outputs:
     Description: "Implicit IAM Role created for Respond Discussion Function"
     Value: !GetAtt RespondDiscussionFunctionRole.Arn
 
-  # RespondCommentApi:
-  #   Description: "API Gateway endpoint URL for Prod stage for Respond Comment function"
-  #   Value: !Sub "https://${DiscussionAPI}.execute-api.${AWS::Region}.amazonaws.com/Prod/respondcomment/"
   RespondCommentFunction:
     Description: "Respond Comment Lambda Function ARN"
     Value: !GetAtt RespondCommentFunction.Arn
@@ -125,9 +119,6 @@ Outputs:
     Description: "Implicit IAM Role created for Respond Comment Function"
     Value: !GetAtt RespondCommentFunctionRole.Arn
 
-  # AllCommentsApi:
-  #   Description: "API Gateway endpoint URL for Prod stage for All Comments Function"
-  #   Value: !Sub "https://${DiscussionAPI}.execute-api.${AWS::Region}.amazonaws.com/Prod/allcomments/"
   AllCommentsFunction:
     Description: "All Comments Lambda Function ARN"
     Value: !GetAtt AllCommentsFunction.Arn
