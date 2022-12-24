@@ -119,7 +119,7 @@ def get_all_comments(event, context):
             flatten_tree(comment_info, result)
             
         if len(result) > 0:
-            out["statusCode"] = 201
+            out["statusCode"] = 200
             out["body"]["message"] = "All messages retrieved"
             out["body"]["comments"] = result
             out["body"] = json.dumps(out["body"])

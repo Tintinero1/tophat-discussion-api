@@ -109,7 +109,7 @@ def test_get_all_comments():
 
     out = get_all_comments(event4,"")
     out["body"] = json.loads(out["body"])
-    assert out["statusCode"] == 201
+    assert out["statusCode"] == 200
     assert out["body"]["message"] == "All messages retrieved"
     assert out["body"]["comments"] == QUESTION_1_RESULT
 
@@ -121,7 +121,7 @@ def test_get_all_comments():
 
     out = get_all_comments(event5,"")
     out["body"] = json.loads(out["body"])
-    assert out["statusCode"] == 201
+    assert out["statusCode"] == 200
     assert out["body"]["message"] == "All messages retrieved"
     assert out["body"]["comments"] == QUESTION_2_RESULT
 
@@ -133,7 +133,7 @@ def test_get_all_comments():
 
     out = get_all_comments(event6,"")
     out["body"] = json.loads(out["body"])
-    assert out["statusCode"] == 201
+    assert out["statusCode"] == 200
     assert out["body"]["message"] == "All messages retrieved"
     assert out["body"]["comments"] == QUESTION_3_RESULT
 

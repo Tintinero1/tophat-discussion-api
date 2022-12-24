@@ -1,0 +1,1 @@
+API_GATEWAY_URL = "https://cpa4bggh7c.execute-api.us-west-1.amazonaws.com/Prod"
