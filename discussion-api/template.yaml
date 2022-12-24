@@ -10,8 +10,23 @@ Globals:
   Function:
     Timeout: 3
     MemorySize: 128
+    Environment:
+      Variables:
+        ENV_VARS: "{PYTHONPATH=/var/task/}"
 
 Resources:
+
+  DiscussionAPI:
+      Type: AWS::Serverless::Api
+      Properties:
+        StageName: Prod
+        Cors:
+          AllowMethods: "'GET,POST,OPTIONS'"
+          AllowHeaders: "'content-type'"
+          AllowOrigin: "'*'"
+          AllowCredentials: false
+
+
   StartDiscussionFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -24,49 +39,98 @@ Resources:
         StartDiscussion:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
+            RestApiId: !Ref DiscussionAPI
             Path: /startdiscussion
             Method: post
   
-  RespondFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  RespondDiscussionFunction:
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: discussion/
-      Handler: respond.respond
+      Handler: respond_discussion.respond_discussion
       Runtime: python3.9
       Architectures:
         - x86_64
       Events:
         StartDiscussion:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api
           Properties:
-            Path: /respond
+            RestApiId: !Ref DiscussionAPI
+            Path: /respondDiscussion
             Method: post
 
-  RetrieveCommentsFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  RespondCommentFunction:
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: discussion/
-      Handler: retrieve_comments.retrieve_comments
+      Handler: respond_comment.respond_comment
       Runtime: python3.9
       Architectures:
         - x86_64
       Events:
         StartDiscussion:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api
           Properties:
-            Path: /retrievecomments
+            RestApiId: !Ref DiscussionAPI
+            Path: /respondComment
+            Method: post
+
+  AllCommentsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: discussion/
+      Handler: get_all_comments.get_all_comments
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        StartDiscussion:
+          Type: Api
+          Properties:
+            RestApiId: !Ref DiscussionAPI
+            Path: /allComments
             Method: get
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  DiscussionApi:
+    Description: "API Gateway endpoint URL for Prod stage for Discussion function"
+    Value: !Sub "https://${DiscussionAPI}.execute-api.${AWS::Region}.amazonaws.com/Prod/discussion/"
+  StartDiscussionFunction:
+    Description: "Start Discussion Lambda Function ARN"
+    Value: !GetAtt StartDiscussionFunction.Arn
+  StartDiscussionFunctionIamRole:
+    Description: "Implicit IAM Role created for Start Discussion Function"
+    Value: !GetAtt StartDiscussionFunctionRole.Arn
+
+  # RespondDiscussionApi:
+  #   Description: "API Gateway endpoint URL for Prod stage for Respond Discussion function"
+  #   Value: !Sub "https://${DiscussionAPI}.execute-api.${AWS::Region}.amazonaws.com/Prod/responddiscussion/"
+  RespondDiscussionFunction:
+    Description: "Respond Discussion Lambda Function ARN"
+    Value: !GetAtt RespondDiscussionFunction.Arn
+  RespondDiscussionFunctionIamRole:
+    Description: "Implicit IAM Role created for Respond Discussion Function"
+    Value: !GetAtt RespondDiscussionFunctionRole.Arn
+
+  # RespondCommentApi:
+  #   Description: "API Gateway endpoint URL for Prod stage for Respond Comment function"
+  #   Value: !Sub "https://${DiscussionAPI}.execute-api.${AWS::Region}.amazonaws.com/Prod/respondcomment/"
+  RespondCommentFunction:
+    Description: "Respond Comment Lambda Function ARN"
+    Value: !GetAtt RespondCommentFunction.Arn
+  RespondCommentFunctionIamRole:
+    Description: "Implicit IAM Role created for Respond Comment Function"
+    Value: !GetAtt RespondCommentFunctionRole.Arn
+
+  # AllCommentsApi:
+  #   Description: "API Gateway endpoint URL for Prod stage for All Comments Function"
+  #   Value: !Sub "https://${DiscussionAPI}.execute-api.${AWS::Region}.amazonaws.com/Prod/allcomments/"
+  AllCommentsFunction:
+    Description: "All Comments Lambda Function ARN"
+    Value: !GetAtt AllCommentsFunction.Arn
+  AllCommentsFunctionIamRole:
+    Description: "Implicit IAM Role created for All Comments Function"
+    Value: !GetAtt AllCommentsFunctionRole.Arn

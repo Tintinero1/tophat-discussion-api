@@ -6,12 +6,16 @@ from utils.delete_db_info import delete_db_info
 
 def test_respond_discussion():
     delete_db_info()
-    start_discussion(DISCUSSION_EVENT, "")
-
+    event = {
+        "body": json.dumps(DISCUSSION_EVENT)
+    }
+    start_discussion(event, "")
     event1 = {
-        "question": "What is your favorite color",
-        "started_by": "Clair",
-        "comment": "Red"
+        "body": json.dumps({
+            "question": "What is your favorite color",
+            "started_by": "Clair",
+            "comment": "Red"
+        })
     }
 
     out = respond_discussion(event1,"")
@@ -21,9 +25,11 @@ def test_respond_discussion():
     assert out["body"]["comment_id"] > 0
 
     event2 = {
-        "question": "",
-        "started_by": "Graham",
-        "comment": "Blue is my favorite"
+        "body": json.dumps({
+            "question": "",
+            "started_by": "Graham",
+            "comment": "Blue is my favorite"
+        })
     }
 
     out = respond_discussion(event2,"")
@@ -33,9 +39,11 @@ def test_respond_discussion():
     assert "comment_id" not in out["body"].keys()
 
     event3 = {
-        "question": "What is your favorite color",
-        "started_by": "",
-        "comment": "My favorite color is Yellow!"
+        "body": json.dumps({
+            "question": "What is your favorite color",
+            "started_by": "",
+            "comment": "My favorite color is Yellow!"
+        })
     }
 
     out = respond_discussion(event3,"")
@@ -45,9 +53,11 @@ def test_respond_discussion():
     assert out["body"]["comment_id"] > 0
 
     event4 = {
-        "question": "What is your favorite color",
-        "started_by": "Layla",
-        "comment": ""
+        "body": json.dumps({
+            "question": "What is your favorite color",
+            "started_by": "Layla",
+            "comment": ""
+        })
     }
 
     out = respond_discussion(event4,"")
@@ -57,9 +67,11 @@ def test_respond_discussion():
     assert "comment_id" not in out["body"].keys()
 
     event5 = {
-        "question": "What is your favorite color",
-        "started_by": "Christian",
-        "comment": "I LOVE black, so dark..."
+        "body": json.dumps({
+            "question": "What is your favorite color",
+            "started_by": "Christian",
+            "comment": "I LOVE black, so dark..."
+        })
     }
 
     out = respond_discussion(event5,"")
@@ -69,9 +81,11 @@ def test_respond_discussion():
     assert out["body"]["comment_id"] > 0
 
     event6 = {
-        "question": "How old are you",
-        "started_by": "Christian",
-        "comment": "I am 15 years old"
+        "body": json.dumps({
+            "question": "How old are you",
+            "started_by": "Christian",
+            "comment": "I am 15 years old"
+        })
     }
 
     out = respond_discussion(event6,"")

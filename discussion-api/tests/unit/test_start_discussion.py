@@ -5,8 +5,10 @@ from utils.delete_db_info import delete_db_info
 def test_start_empty_discussion():
     delete_db_info()
     event = {
-        "started_by": "",
-        "question": ""
+        "body": json.dumps({
+            "started_by": "",
+            "question": ""
+        })
     }
     out = start_discussion(event,"")
     out["body"] = json.loads(out["body"])
@@ -19,8 +21,10 @@ def test_start_empty_discussion():
 def test_start_discussion():
     delete_db_info()
     event1 = {
-        "started_by": "Thomas",
-        "question": "What is your favorite color"
+        "body": json.dumps({
+            "started_by": "Thomas",
+            "question": "What is your favorite color"
+        })
     }
 
     out = start_discussion(event1,"")
@@ -30,8 +34,10 @@ def test_start_discussion():
     assert out["body"]["discussion_id"] > 0
 
     event2 = {
-        "started_by": "",
-        "question": "How old are you"
+        "body": json.dumps({
+            "started_by": "",
+            "question": "How old are you"
+        })
     }
 
     out = start_discussion(event2,"")
@@ -41,8 +47,10 @@ def test_start_discussion():
     assert out["body"]["discussion_id"] > 0
 
     event3 = {
-        "started_by": "Joel",
-        "question": ""
+        "body": json.dumps({
+            "started_by": "Joel",
+            "question": ""
+        })
     }
 
     out = start_discussion(event3,"")
@@ -52,8 +60,10 @@ def test_start_discussion():
     assert "discussion_id" not in out["body"].keys()
 
     event4 = {
-        "started_by": "Thomas",
-        "question": "What is your favorite color"
+        "body": json.dumps({
+            "started_by": "Thomas",
+            "question": "What is your favorite color"
+        })
     }
 
     out = start_discussion(event4,"")

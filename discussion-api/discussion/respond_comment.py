@@ -1,14 +1,14 @@
 import json
 
-from discussion.respond_discussion import respond_discussion
-from discussion.db_handler.mysql_dbconn import DbConnection
-from discussion.db_handler.db_vars import (
+from respond_discussion import respond_discussion
+from db_handler.mysql_dbconn import DbConnection
+from db_handler.db_vars import (
     ENDPOINT_URL,
     USERNAME,
     PASSWORD,
     DB_NAME
 )
-from discussion.common import (
+from common_handlers import (
     validate_comment_id,
     validate_commment,
     validate_user
@@ -51,16 +51,18 @@ def respond_comment(event, context):
                 ID number for the recently created response (comment)
     """
 
-    try:
-        comment_id = event['comment_id']
-        started_by = validate_user(event['started_by'])
-        response = event['response']
-        out = {
+    out = {
             "statusCode": 500,
             "body": {
                 "message": "Internal server error"
             }
         }
+
+    try:
+        event = json.loads(event.get("body"))
+        comment_id = event.get('comment_id')
+        started_by = validate_user(event.get('started_by'))
+        response = event.get('response')
 
         if validate_comment_id(comment_id) == False:
             out["statusCode"] = 400
@@ -87,7 +89,9 @@ def respond_comment(event, context):
             out["body"]["message"] = "Created new response"
             out["body"]["comment_id"] = out_comment_params[0]
             out["body"] = json.dumps(out["body"])
+            return out
 
+        out["body"] = json.dumps(out["body"])
     except Exception as e:
         # Send some context about this error to Lambda Logs
         print(e)

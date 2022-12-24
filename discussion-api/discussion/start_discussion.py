@@ -1,13 +1,13 @@
 import json
 
-from discussion.db_handler.mysql_dbconn import DbConnection
-from discussion.db_handler.db_vars import (
+from db_handler.mysql_dbconn import DbConnection
+from db_handler.db_vars import (
     ENDPOINT_URL,
     USERNAME,
     PASSWORD,
     DB_NAME
 )
-from discussion.common import (
+from common_handlers import (
     validate_user,
     validate_question
 )
@@ -45,16 +45,17 @@ def start_discussion(event, context):
             discussion_id: int, if successful response
                 ID number for the recently created discussion if applies
     """
-
-    try:
-        started_by = validate_user(event['started_by'])
-        question = event['question']
-        out = {
+    out = {
             "statusCode": 500,
             "body": {
                 "message": "Internal server error"
             }
         }
+
+    try:
+        event = json.loads(event.get("body"))
+        started_by = validate_user(event.get('started_by'))
+        question = event.get('question')
 
         if validate_question(question) == False:
             out["statusCode"] = 400
@@ -71,11 +72,14 @@ def start_discussion(event, context):
             out["body"]["message"] = "Created new discussion"
             out["body"]["discussion_id"] = out_discussion_parameters[0]
             out["body"] = json.dumps(out["body"])
+            return out
         elif out_discussion_parameters and out_discussion_parameters[0] == 0:
             out["statusCode"] = 400
             out["body"]["message"] = "Discussion already exists"
             out["body"] = json.dumps(out["body"])
-
+            return out
+        
+        out["body"] = json.dumps(out["body"])
     except Exception as e:
         # Send some context about this error to Lambda Logs
         print(e)

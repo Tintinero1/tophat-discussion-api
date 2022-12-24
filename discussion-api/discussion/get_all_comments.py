@@ -1,13 +1,13 @@
 import json
 
-from discussion.db_handler.mysql_dbconn import DbConnection
-from discussion.db_handler.db_vars import (
+from db_handler.mysql_dbconn import DbConnection
+from db_handler.db_vars import (
     ENDPOINT_URL,
     USERNAME,
     PASSWORD,
     DB_NAME
 )
-from discussion.common import (
+from common_handlers import (
     validate_question
 )
 
@@ -42,14 +42,16 @@ def get_all_comments(event, context):
                 List of all comments available in the DataBase in a flat tree 
     """
 
-    try:
-        question = event["question"]
-        out = {
+    out = {
             "statusCode": 500,
             "body": {
                 "message": "Internal server error"
             }
         }
+
+    try:
+        event = event.get("queryStringParameters")
+        question = event.get("question")
 
         if validate_question(question) == False:
             out["statusCode"] = 400
@@ -121,8 +123,9 @@ def get_all_comments(event, context):
             out["body"]["message"] = "All messages retrieved"
             out["body"]["comments"] = result
             out["body"] = json.dumps(out["body"])
+            return out
             
-
+        out["body"] = json.dumps(out["body"])
     except Exception as e:
         # Send some context about this error to Lambda Logs
         print(e)

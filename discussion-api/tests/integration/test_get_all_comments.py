@@ -1,4 +1,4 @@
-import json
+import requests
 from discussion.get_all_comments import get_all_comments
 from respond_comment import respond_comment
 from discussion.start_discussion import start_discussion
