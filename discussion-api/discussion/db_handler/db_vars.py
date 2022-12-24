@@ -1,0 +1,5 @@
+ENDPOINT_URL = "tophatdiscussiondb.cyybjsxuimkl.us-west-1.rds.amazonaws.com"
+PORT = "3306"
+USERNAME = "tophat"
+PASSWORD = "tophatdiscussionapi"
+DB_NAME = "tophat_discussion_db"

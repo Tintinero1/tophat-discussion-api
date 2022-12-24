@@ -1,0 +1,127 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  discussion-api
+
+  Sample SAM Template for discussion-api
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+    Environment:
+      Variables:
+        ENV_VARS: "{PYTHONPATH=/var/task/}"
+
+Resources:
+
+  DiscussionAPI:
+      Type: AWS::Serverless::Api
+      Properties:
+        StageName: Prod
+        Cors:
+          AllowMethods: "'GET,POST,OPTIONS'"
+          AllowHeaders: "'content-type'"
+          AllowOrigin: "'*'"
+          AllowCredentials: false
+
+
+  StartDiscussionFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: discussion/
+      Handler: start_discussion.start_discussion
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        StartDiscussion:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            RestApiId: !Ref DiscussionAPI
+            Path: /startdiscussion
+            Method: post
+  
+  RespondDiscussionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: discussion/
+      Handler: respond_discussion.respond_discussion
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        StartDiscussion:
+          Type: Api
+          Properties:
+            RestApiId: !Ref DiscussionAPI
+            Path: /respondDiscussion
+            Method: post
+
+  RespondCommentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: discussion/
+      Handler: respond_comment.respond_comment
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        StartDiscussion:
+          Type: Api
+          Properties:
+            RestApiId: !Ref DiscussionAPI
+            Path: /respondComment
+            Method: post
+
+  AllCommentsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: discussion/
+      Handler: get_all_comments.get_all_comments
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        StartDiscussion:
+          Type: Api
+          Properties:
+            RestApiId: !Ref DiscussionAPI
+            Path: /allComments
+            Method: get
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  DiscussionApi:
+    Description: "API Gateway endpoint URL for Prod stage for Discussion function"
+    Value: !Sub "https://${DiscussionAPI}.execute-api.${AWS::Region}.amazonaws.com/Prod/discussion/"
+  StartDiscussionFunction:
+    Description: "Start Discussion Lambda Function ARN"
+    Value: !GetAtt StartDiscussionFunction.Arn
+  StartDiscussionFunctionIamRole:
+    Description: "Implicit IAM Role created for Start Discussion Function"
+    Value: !GetAtt StartDiscussionFunctionRole.Arn
+
+  RespondDiscussionFunction:
+    Description: "Respond Discussion Lambda Function ARN"
+    Value: !GetAtt RespondDiscussionFunction.Arn
+  RespondDiscussionFunctionIamRole:
+    Description: "Implicit IAM Role created for Respond Discussion Function"
+    Value: !GetAtt RespondDiscussionFunctionRole.Arn
+
+  RespondCommentFunction:
+    Description: "Respond Comment Lambda Function ARN"
+    Value: !GetAtt RespondCommentFunction.Arn
+  RespondCommentFunctionIamRole:
+    Description: "Implicit IAM Role created for Respond Comment Function"
+    Value: !GetAtt RespondCommentFunctionRole.Arn
+
+  AllCommentsFunction:
+    Description: "All Comments Lambda Function ARN"
+    Value: !GetAtt AllCommentsFunction.Arn
+  AllCommentsFunctionIamRole:
+    Description: "Implicit IAM Role created for All Comments Function"
+    Value: !GetAtt AllCommentsFunctionRole.Arn

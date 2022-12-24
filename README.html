@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>tophat-discussion-api</title>
+        <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+/* From extension ms-toolsai.jupyter */
+/* These classnames are inherited from bootstrap, but are present in most notebook renderers */
+
+.alert {
+    width: auto;
+    padding: 1em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+.alert > *:last-child {
+    margin-bottom: 0;
+}
+#preview > .alert:last-child {
+    /* Prevent this being set to zero by the default notebook stylesheet */
+    padding-bottom: 1em;
+}
+
+.alert-success {
+    /* Note there is no suitable color available, so we just copy "info" */
+    background-color: var(--theme-info-background);
+    color: var(--theme-info-foreground);
+}
+.alert-info {
+    background-color: var(--theme-info-background);
+    color: var(--theme-info-foreground);
+}
+.alert-warning {
+    background-color: var(--theme-warning-background);
+    color: var(--theme-warning-foreground);
+}
+.alert-danger {
+    background-color: var(--theme-error-background);
+    color: var(--theme-error-foreground);
+}
+
+</style>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+        
+    </head>
+    <body class="vscode-body vscode-light">
+        <h1 id="tophat-discussion-api">tophat-discussion-api</h1>
+<h1 id="deploy">Deploy</h1>
+<h2 id="creating-aws-account-and-configuring-credentials">Creating AWS account and configuring credentials</h2>
+<p>Create an amazon AWS account [<a href="https://signin.aws.amazon.com/">https://signin.aws.amazon.com/</a>]</p>
+<p>Create and configure your aws access key credential [<a href="https://us-east-1.console.aws.amazon.com/iam/home#/security_credentials$access_key">https://us-east-1.console.aws.amazon.com/iam/home#/security_credentials$access_key</a>]</p>
+<p>In your local terminal type:
+$ aws configure</p>
+<p>When prompted:
+AWS access key ID: paste your AWS access key ID
+AWS Secret Access Key: paste your AWS Secret Access Key
+Default region name: us-west-1
+Default output format: json</p>
+<h2 id="creating-aws-mysql-db-aws-rds">Creating AWS MYSQL DB (AWS RDS)</h2>
+<p>Check the official docummentation: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SettingUp.html">https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SettingUp.html</a></p>
+<p><strong>Copy and paste this command in your terminal to create the DB</strong></p>
+<p>aws rds create-db-instance --db-name tophat_discussion_db --engine MySQL <br>
+--engine-version 8.0.30 <br>
+--db-instance-identifier &quot;tophatDiscussionDb&quot; --backup-retention-period 3 <br>
+--db-instance-class db.t3.micro --allocated-storage 5 --publicly-accessible <br>
+--master-username tophat --master-user-password tophatdiscussionapi</p>
+<p><strong>Obtain endpoint</strong></p>
+<p>aws rds describe-db-instances <br>
+--db-instance-identifier &quot;tophatDiscussionDb&quot; <br>
+--query 'DBInstances[0].Endpoint'</p>
+<p>--vpc-security-group-ids</p>
+
+        <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+        
+    </body>
+    </html>
