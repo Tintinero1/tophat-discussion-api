@@ -185,6 +185,9 @@ Go to route ```tophat/discussion-api``` and run:
 
 To export python path variable to your bashrc
 
+
+For Integration tests you must replace your API ENDPOINT Invoke URL in the file ```discussion-api/tests/integration/test_vars.py```
+
 **Installing dependencies**
 
 go to ```discussion-api/discussion/`` and run:

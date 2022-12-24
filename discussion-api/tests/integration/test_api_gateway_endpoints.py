@@ -8,8 +8,6 @@ ua = UserAgent()
 
 logger = logging.getLogger(__name__)
 
-API_GATEWAY_URL = "https://cpa4bggh7c.execute-api.us-west-1.amazonaws.com/Prod"
-
 def test_api_gateway_start_discussion():
     url_to_test = API_GATEWAY_URL + "/startdiscussion"
     logger.info(f"url: {url_to_test}")
