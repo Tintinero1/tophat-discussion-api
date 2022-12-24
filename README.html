@@ -77,30 +77,444 @@
     </head>
     <body class="vscode-body vscode-light">
         <h1 id="tophat-discussion-api">tophat-discussion-api</h1>
-<h1 id="deploy">Deploy</h1>
+<h1 id="deploy-database">Deploy DataBase</h1>
 <h2 id="creating-aws-account-and-configuring-credentials">Creating AWS account and configuring credentials</h2>
 <p>Create an amazon AWS account [<a href="https://signin.aws.amazon.com/">https://signin.aws.amazon.com/</a>]</p>
 <p>Create and configure your aws access key credential [<a href="https://us-east-1.console.aws.amazon.com/iam/home#/security_credentials$access_key">https://us-east-1.console.aws.amazon.com/iam/home#/security_credentials$access_key</a>]</p>
-<p>In your local terminal type:
-$ aws configure</p>
-<p>When prompted:
-AWS access key ID: paste your AWS access key ID
-AWS Secret Access Key: paste your AWS Secret Access Key
-Default region name: us-west-1
-Default output format: json</p>
+<p>In your local terminal type:</p>
+<pre><code>`aws configure`
+</code></pre>
+<p>When prompted:</p>
+<pre><code>    AWS access key ID: paste your AWS access key ID
+    AWS Secret Access Key: paste your AWS Secret Access Key
+    Default region name: us-west-1
+    Default output format: json
+</code></pre>
+<h2 id="setup-aws-cli">SETUP AWS CLI</h2>
+<p>Please follow instructions from this URL:
+<code>https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html</code></p>
+<h2 id="setup-aws-sam">SETUP AWS SAM</h2>
+<p>Please follow instructions from this URL:
+<code>https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html</code></p>
+<h2 id="setup-mysql-workbench">SETUP MYSQL WORKBENCH</h2>
+<p>Please install MYSQL Workbench, it will be needed later on:
+<code>https://dev.mysql.com/downloads/workbench/</code></p>
 <h2 id="creating-aws-mysql-db-aws-rds">Creating AWS MYSQL DB (AWS RDS)</h2>
-<p>Check the official docummentation: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SettingUp.html">https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SettingUp.html</a></p>
+<p>When in trouble check the official docummentation: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SettingUp.html">https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SettingUp.html</a></p>
 <p><strong>Copy and paste this command in your terminal to create the DB</strong></p>
-<p>aws rds create-db-instance --db-name tophat_discussion_db --engine MySQL <br>
---engine-version 8.0.30 <br>
---db-instance-identifier &quot;tophatDiscussionDb&quot; --backup-retention-period 3 <br>
---db-instance-class db.t3.micro --allocated-storage 5 --publicly-accessible <br>
---master-username tophat --master-user-password tophatdiscussionapi</p>
+<pre><code>    aws rds create-db-instance --db-name tophat_discussion_db --engine MySQL \
+    --engine-version 8.0.30 \
+    --db-instance-identifier &quot;tophatDiscussionDb&quot; --backup-retention-period 3 \
+    --db-instance-class db.t3.micro --allocated-storage 5 --publicly-accessible \
+    --master-username tophat --master-user-password tophatdiscussionapi
+</code></pre>
+<p><code>NOTE: Do not save username and password in text documents. This is only for exercise demonstration purposes</code></p>
+<p>Paste username and password on <code>discussion-api/discussion/db_handler/db_vars.py =&gt; USERNAME / PASSWORD</code></p>
+<p><strong>EDIT security group on AWS console online</strong></p>
+<p>Go to your AWS RDS DB Instances and select tophatdiscussiondb
+<code>https://us-west-1.console.aws.amazon.com/rds/home?region=us-west-1#databases:</code></p>
+<p>now in the main page on the subpage <code>Connectivity &amp; security</code>
+click on your default VPC security group (example: default (sg-047ab15fe2b120f03))</p>
+<p>click on your <code>Security group ID</code> to modify it</p>
+<p>click on <code>Edit inbound rules</code></p>
+<p>Delete the only current inbound rule</p>
+<p>Click on <code>Add rule</code></p>
+<p>On <code>Type</code> select <code>All traffic</code></p>
+<p>On <code>Source</code> select <code>Anywhere-Ipv4</code></p>
+<p>Click on <code>Save rules</code></p>
 <p><strong>Obtain endpoint</strong></p>
-<p>aws rds describe-db-instances <br>
---db-instance-identifier &quot;tophatDiscussionDb&quot; <br>
---query 'DBInstances[0].Endpoint'</p>
-<p>--vpc-security-group-ids</p>
+<p>In your local terminal run:</p>
+<pre><code>    aws rds describe-db-instances \
+        --db-instance-identifier &quot;tophatDiscussionDb&quot; \
+        --query 'DBInstances[0].Endpoint'
+</code></pre>
+<p>Copy Address of result (DB ENDPOINT)</p>
+<p>EXAMPLE: <code>tophatdiscussiondb.cyybjsxuimkl.us-west-1.rds.amazonaws.com</code></p>
+<p>Paste it on <code>discussion-api/discussion/db_handler/db_vars.py =&gt; ENDPOINT_URL</code></p>
+<p><code>NOTE: Writing variables in this way IS NOT A GOOD IDEA, this is a leak of security.</code>
+<code>What you would want to do is to create an ENV variable to hold this sensitive information</code>
+<code>but because this is an excersise we will do it this way.</code></p>
+<p><strong>Load MYSQL Dump file to recently created RDS MYSQL Instance</strong>
+1:
+Open MYSQL Workbench</p>
+<p>Add a new MySQL Connection</p>
+<p>Give a name to the connection</p>
+<p>Paste your DB ENDPOINT from previous step to Hostname textbox</p>
+<p>Make sure port is 3306</p>
+<p>Paste your Username from previous step to Username textbox</p>
+<p>Paste your Password from previous step to Password textbox</p>
+<p>Click <code>Ok</code></p>
+<p>2:
+Click your recently created Connection</p>
+<p>Once connected, Click on <code>Server - Data Import</code></p>
+<p>Click on <code>Import from Self-Contained File</code> and select <code>tophat.sql</code> from <code>db_schema</code> folder in this project</p>
+<p>Select tophat_discussion_db on Default Target Schema</p>
+<p>Select Dump Structure and Data</p>
+<p>Click on <code>Start Import</code></p>
+<h1 id="deploy-code">Deploy code</h1>
+<p>Make sure to be at <code>discussion-api</code> folder</p>
+<p>To deploy the code to AWS run:</p>
+<pre><code>    sam build
+</code></pre>
+<pre><code>    sam deploy --guided
+</code></pre>
+<p>When prompted introduce this values:</p>
+<pre><code>    Setting default arguments for 'sam deploy'
+            =========================================
+            Stack Name [sam-app]: discussion-app
+            AWS Region [us-west-1]: us-west-1
+            #Shows you resources changes to be deployed and require a 'Y' to initiate deploy
+            Confirm changes before deploy [y/N]: y
+            #SAM needs permission to be able to create roles to connect to the resources in your template
+            Allow SAM CLI IAM role creation [Y/n]: y
+            #Preserves the state of previously provisioned resources when an operation fails
+            Disable rollback [y/N]: y
+            StartDiscussionFunction may not have authorization defined, Is this okay? [y/N]: y
+            RespondDiscussionFunction may not have authorization defined, Is this okay? [y/N]: y
+            RespondCommentFunction may not have authorization defined, Is this okay? [y/N]: y
+            AllCommentsFunction may not have authorization defined, Is this okay? [y/N]: y
+            Save arguments to configuration file [Y/n]: y
+            SAM configuration file [samconfig.toml]:  PRESS ENTER
+            SAM configuration environment [default]:  PRESS ENTER
+</code></pre>
+<p>After deploying we are ready to test functionallity</p>
+<p>Log in into aws console and go to API Gateway menu</p>
+<p>Make sure you are in the correct region</p>
+<p>click on discussion-app</p>
+<p>click on stages</p>
+<p>click on Prod</p>
+<p>Locate Label Invoke URL and copy the value
+EXAMPLE: <a href="https://cpa4bggh7c.execute-api.us-west-1.amazonaws.com/Prod">https://cpa4bggh7c.execute-api.us-west-1.amazonaws.com/Prod</a></p>
+<p>Click on Resources</p>
+<p>Now you can use a tool like postman to test functionallity manually
+just append the api endpoint path of each function to the InvokeURL</p>
+<h1 id="testing">Testing</h1>
+<p>Go to route <code>tophat/discussion-api</code> and run:</p>
+<pre><code>    bash setEnvPythonPath.sh
+</code></pre>
+<p>To export python path variable to your bashrc</p>
+<p><strong>Installing dependencies</strong></p>
+<p>go to ```discussion-api/discussion/`` and run:</p>
+<pre><code>    pip install -r requirements.txt
+</code></pre>
+<p>cd to root folder and you can test running:</p>
+<pre><code>    pytest -v
+</code></pre>
+<p>This will test API endpoints as well as the local code.
+<code>NOTE: For this excercise purpose only. Tests delete all data in the database to recreate testing data</code>
+<code>Try using the util populate_db.py :)</code></p>
+<h1 id="utils">Utils</h1>
+<p>You can find some utils in <code>discussion-api/utils</code></p>
+<p><code>delete_db_info.py</code> Will erase all data in the DataBase</p>
+<p><code>populate_db.py</code> Will add some meaningful data to be able to see and manually test with postman</p>
+<h1 id="api-documentation">API DOCUMENTATION</h1>
+<p><strong>Function Name: get_all_comments</strong></p>
+<p><strong>ENDPOINT: ${Invoke URL}/allComments</strong></p>
+<p><strong>EXAMPLE: <a href="https://cpa4bggh7c.execute-api.us-west-1.amazonaws.com/Prod/allComments?question=Do%20you%20have%20pets">https://cpa4bggh7c.execute-api.us-west-1.amazonaws.com/Prod/allComments?question=Do you have pets</a>?</strong></p>
+<p><strong>Method: GET</strong>
+Send querystring parameters to this endpoint</p>
+<pre><code>    get_all_comments(event, context):
+        &quot;&quot;&quot;Get All Comments Lambda function
+        This Lambda Funcion will retrieve all comments available in the DataBase in a flat tree for a given discussion
+
+        Parameters
+        ----------
+        event: dict, required
+            API Gateway Lambda Proxy Input Format
+
+            question: string, required
+                Discussion Question where the comments will be retrieved from
+
+        context: object, required
+            Lambda Context runtime methods and attributes
+
+        Returns
+        ------
+        API Gateway Lambda Proxy Output Format: dict
+
+            statusCode: int
+                HTTP Status Code
+            
+            body: dict
+
+                message: string
+                    Message response from the backend
+
+                comments: list, if successful response
+                    List of all comments available in the DataBase in a flat tree 
+        &quot;&quot;&quot;
+</code></pre>
+<p><strong>Messages</strong></p>
+<pre><code>{
+    &quot;statusCode&quot;: 500,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;Internal server error&quot;
+    }
+}
+
+{
+    &quot;statusCode&quot;: 400,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;Invalid question. Questions must have text&quot;
+    }
+}
+
+{
+    &quot;statusCode&quot;: 400,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;Invalid question. Question does not exists&quot;
+    }
+}
+
+{
+    &quot;statusCode&quot;: 404,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;No commments available for this discussion&quot;
+    }
+}
+
+{
+    &quot;statusCode&quot;: 200,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;All messages retrieved&quot;,
+        &quot;comments&quot;: ...
+    }
+}
+</code></pre>
+<p><strong>Function Name: respond_comment</strong></p>
+<p><strong>ENDPOINT: ${Invoke URL}/respondComment</strong></p>
+<p><strong>EXAMPLE: <a href="https://cpa4bggh7c.execute-api.us-west-1.amazonaws.com/Prod/respondComment">https://cpa4bggh7c.execute-api.us-west-1.amazonaws.com/Prod/respondComment</a></strong></p>
+<p><strong>Method: POST</strong></p>
+<pre><code>    &quot;&quot;&quot;Create Respond Lambda function
+        This Lambda Funcion will start a discussion and save it in DataBase
+
+        Parameters
+        ----------
+        event: dict, required
+            API Gateway Lambda Proxy Input Format
+
+            comment_id: int, required
+                ID of the comment to be responded
+
+            started_by: string, required
+                Name of the user that will be responding the comment
+            
+            response: string, required
+                Response (comment) to be linked with the comment_id
+
+        context: object, required
+            Lambda Context runtime methods and attributes
+
+        Returns
+        ------
+        API Gateway Lambda Proxy Output Format: dict
+
+            statusCode: int
+                HTTP Status Code
+            
+            body: dict
+
+                message: string
+                    Message response from the backend
+
+                comment_id: int, if successful response
+                    ID number for the recently created response (comment)
+    &quot;&quot;&quot;
+</code></pre>
+<p><strong>POST event example</strong></p>
+<pre><code>    {
+        &quot;comment_id&quot;: &quot;2&quot;,
+        &quot;started_by&quot;: &quot;Ryan&quot;,
+        &quot;response&quot;: &quot;That is awesome Clair&quot;
+    }
+</code></pre>
+<p><strong>Messages</strong></p>
+<pre><code>{
+    &quot;statusCode&quot;: 500,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;Internal server error&quot;
+    }
+}
+
+{
+    &quot;statusCode&quot;: 400,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;Invalid comment id. comment id must be a number&quot;
+    }
+}
+
+{
+    &quot;statusCode&quot;: 400,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;Invalid response. Response must have text&quot;
+    }
+}
+
+{
+    &quot;statusCode&quot;: 201,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;Created new response&quot;,
+        &quot;comment_id&quot; ...
+    }
+}
+</code></pre>
+<p><strong>Function Name: respond_discussion</strong></p>
+<p><strong>ENDPOINT: ${Invoke URL}/respondDiscussion</strong></p>
+<p><strong>EXAMPLE: <a href="https://cpa4bggh7c.execute-api.us-west-1.amazonaws.com/Prod/respondDiscussion">https://cpa4bggh7c.execute-api.us-west-1.amazonaws.com/Prod/respondDiscussion</a></strong></p>
+<p><strong>Method: POST</strong></p>
+<pre><code>    &quot;&quot;&quot;Respond Discussion Lambda function
+    This Lambda Funcion will respond a discussion and save it in DataBase
+
+    Parameters
+    ----------
+    event: dict, required
+        API Gateway Lambda Proxy Input Format
+
+        started_by: string, required
+            Name of the user starting the Discussion Question
+        
+        question: string, required
+            Question to be put in the Discussion Question
+
+        comment: string, required
+            Comment to be linked with the Discussion Question
+
+    context: object, required
+        Lambda Context runtime methods and attributes
+
+    Returns
+    ------
+    API Gateway Lambda Proxy Output Format: dict
+
+        statusCode: int
+            HTTP Status Code
+        
+        body: dict
+
+            message: string
+                Message response from the backend
+
+            comment_id: int, if successful response
+                ID number for the recently created response (comment)
+    &quot;&quot;&quot;
+</code></pre>
+<p><strong>POST event example</strong></p>
+<pre><code>    {
+        &quot;question&quot;: &quot;Do you have pets?&quot;,
+        &quot;started_by&quot;: &quot;Clair&quot;,
+        &quot;comment&quot;: &quot;I have 2 hamsters!&quot;
+    }
+</code></pre>
+<p><strong>Messages</strong></p>
+<pre><code>{
+    &quot;statusCode&quot;: 500,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;Internal server error&quot;
+    }
+}
+
+{
+    &quot;statusCode&quot;: 400,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;Invalid question. Questions must have text&quot;
+    }
+}
+
+{
+    &quot;statusCode&quot;: 400,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;Invalid question. Cannot respond an unexistent discussion&quot;
+    }
+}
+
+{
+    &quot;statusCode&quot;: 400,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;Invalid comment. Comment must have text&quot;
+    }
+}
+
+{
+    &quot;statusCode&quot;: 201,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;Created new response&quot;,
+        &quot;comment_id&quot; ...
+    }
+}
+</code></pre>
+<p><strong>Function Name: start_discussion</strong></p>
+<p><strong>ENDPOINT: ${Invoke URL}/startdiscussion</strong></p>
+<p><strong>EXAMPLE: <a href="https://cpa4bggh7c.execute-api.us-west-1.amazonaws.com/Prod/startdiscussion">https://cpa4bggh7c.execute-api.us-west-1.amazonaws.com/Prod/startdiscussion</a></strong></p>
+<p><strong>Method: POST</strong></p>
+<pre><code>    &quot;&quot;&quot;Create Discussion Question Lambda Function
+    This Lambda Funcion will start a discussion and save it in DataBase
+
+    Parameters
+    ----------
+    event: dict, required
+        API Gateway Lambda Proxy Input Format
+
+        started_by: string, required
+            Name of the user starting the Discussion Question
+        
+        question: string, required
+            Question to be put in the Discussion Question
+
+    context: object, required
+        Lambda Context runtime methods and attributes
+
+    Returns
+    ------
+    API Gateway Lambda Proxy Output Format: dict
+
+        statusCode: int
+            HTTP Status Code
+        
+        body: dict
+
+            message: string
+                Message response from the backend
+
+            discussion_id: int, if successful response
+                ID number for the recently created discussion if applies
+    &quot;&quot;&quot;
+</code></pre>
+<p><strong>POST event example</strong></p>
+<pre><code>    {
+        &quot;started_by&quot;: &quot;Jason&quot;,
+        &quot;question&quot;: &quot;Do you have pets?&quot;
+    }
+</code></pre>
+<p><strong>Messages</strong></p>
+<pre><code>{
+    &quot;statusCode&quot;: 500,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;Internal server error&quot;
+    }
+}
+
+{
+    &quot;statusCode&quot;: 400,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;Invalid question. Questions must have text&quot;
+    }
+}
+
+{
+    &quot;statusCode&quot;: 400,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;Discussion already exists&quot;
+    }
+}
+
+{
+    &quot;statusCode&quot;: 201,
+    &quot;body&quot;: {
+        &quot;message&quot;: &quot;Created new discussion&quot;,
+        &quot;discussion_id&quot; ...
+    }
+}
+</code></pre>
 
         <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
         
